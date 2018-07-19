@@ -13,17 +13,22 @@ namespace BlogPublishTool
     {
         static void Main(string[] args)
         {
-            try
-            {
-                var result = Parser.Default.ParseArguments<Options>(args);
-                Console.WriteLine(result.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            Console.ReadKey();
+            Parser.Default.ParseArguments<Options>(args)
+             .WithParsed<Options>(opts => RunOptionsAndReturnExitCode(opts))
+             .WithNotParsed<Options>((errs) => HandleParseError(errs));
         }
+
+        private static void HandleParseError(IEnumerable<Error> errs)
+        {
+
+        }
+
+        private static void RunOptionsAndReturnExitCode(Options opts)
+        {
+            opts.
+            
+        }
+
+
     }
 }
