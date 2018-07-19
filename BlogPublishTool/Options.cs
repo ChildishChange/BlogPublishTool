@@ -9,18 +9,18 @@ namespace BlogPublishTool
 {
     class Options
     {
-        [Option('r', "read", Required = true, HelpText = "Input files to be processed.")]
-        public IEnumerable<string> InputFiles { get; set; }
+        [Value(0, HelpText = "Markdown file path.")]
+        public string MarkdownFilePath { get; set; }
 
-        // Omitting long name, defaults to name of property, ie "--verbose"
-        [Option(Default = false, HelpText = "Prints all messages to standard output.")]
-        public bool Verbose { get; set; }
+        [Option('u', "upload", Required = false, Default = false, HelpText = "Upload picture and replace picture file path with URL.")]
+        public bool Upload { get; set; }
 
-        [Option("stdin", Default = false, HelpText = "Read from stdin")]
-        public bool stdin { get; set; }
+        [Option('r', "replace", Required = false, HelpText = "Replace relative document path with URL in json file.")]
+        public string JsonFilePath { get; set; } 
 
-        [Value(0, MetaName = "offset", HelpText = "File offset.")]
-        public long? Offset { get; set; }
+        [Option('p', "publish", Required = false, Default = false, HelpText = "Publish this blog in Markdown format.")]
+        public bool PublishFlag { get; set; }
+        
     }
 
 }
