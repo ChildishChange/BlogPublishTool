@@ -12,25 +12,23 @@ namespace BlogPublishTool
 {
     class MdHandler
     {
-        public static List<string> ParsePicture(string blogFilePath)
+        public static List<string> RegexParser(string blogFilePath, string MatchRule)
         {
-            const string MatchRule = @"!\[.*?\]\((.*?)\)";
-
-            List<string> pictureList = new List<string>();
+            List<string> parseList = new List<string>();
             string blogContent = File.ReadAllText(blogFilePath);
-            var pictures = Regex.Matches(blogContent, MatchRule, RegexOptions.IgnoreCase | RegexOptions.RightToLeft);
-            foreach (Match picture in pictures)
+            var parses = Regex.Matches(blogContent, MatchRule, RegexOptions.IgnoreCase | RegexOptions.RightToLeft);
+            foreach (Match match in parses)
             {
-                pictureList.Add(picture.Groups[1].Value);
+                parseList.Add(match.Groups[1].Value);
             }
-            return pictureList;
+            return parseList;
         }
 
 
-        public static void ReplacePicWithUrl(string resBlogFilePath, Dictionary<string, string> pictureUrlDic)
+        public static void ReplaceContentWithUrl(string resBlogFilePath, Dictionary<string, string> contentUrlDic)
         {
             StringBuilder blogContent = new StringBuilder(File.ReadAllText(resBlogFilePath)); 
-            foreach (KeyValuePair<string,string> pathUrlPair in pictureUrlDic)
+            foreach (KeyValuePair<string,string> pathUrlPair in contentUrlDic)
             {
                 blogContent = blogContent.Replace(pathUrlPair.Key, pathUrlPair.Value);
             }
@@ -38,5 +36,7 @@ namespace BlogPublishTool
 
             File.WriteAllText(resBlogFilePath,blogContent.ToString());
         }
+
+        
     }
 }

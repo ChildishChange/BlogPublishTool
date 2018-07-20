@@ -20,6 +20,9 @@ namespace BlogPublishTool
         private const string blogUrl = "https://www.cnblogs.com/";
         private const string metaWeblogUrl = "https://rpc.cnblogs.com/metaweblog/";
         
+        /// <summary>
+        /// 
+        /// </summary>
         public BlogHandler()
         {
             Console.WriteLine("Please input your blog ID:");
@@ -39,6 +42,10 @@ namespace BlogPublishTool
                 PassWord);
         }
 
+         /// <summary>
+         /// 
+         /// </summary>
+         /// <returns></returns>
         private static string GetPassword()
         {
             var password = new StringBuilder();
@@ -78,7 +85,9 @@ namespace BlogPublishTool
         {
             Client blogClient = new Client(connectionInfo);
             Console.WriteLine("======>START UPLOAD PICTURE<======");
-            var pictureList = MdHandler.ParsePicture(blogFilePath);
+
+            const string MatchRule = @"!\[.*?\]\((.*?)\)";
+            var pictureList = MdHandler.RegexParser(blogFilePath, MatchRule);
 
             Dictionary<string, string> pictureUrlDic = new Dictionary<string, string>();
             
@@ -116,7 +125,7 @@ namespace BlogPublishTool
 
             }
 
-            MdHandler.ReplacePicWithUrl(blogFilePath,pictureUrlDic);
+            MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
             Console.WriteLine("======>END UPLOAD PICTURE<======");
         }
 
@@ -128,6 +137,7 @@ namespace BlogPublishTool
         public static void ReplaceBlogUrl(string blogFilePath, string jsonFilePath)
         {
             Console.WriteLine("======>START REPLACE BLOG URL<======");
+
 
            
             Console.WriteLine("======>END REPLACE BLOG URL<======");
