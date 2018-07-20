@@ -31,14 +31,18 @@ namespace BlogPublishTool
         {
             //login here
             //除了登录是直接调用bloghandler，其他都是调用mdhandler，mdhandler
-            var pass = ReadPassword();
+            
 
-            Console.WriteLine(pass.ToString());
-
-            if(opts.Upload)
+            BlogHandler blogHandler = null;
+            if (opts.UploadFlag||opts.PublishFlag)
             {
-                //upload pic here
-                //
+                blogHandler = new BlogHandler();
+            }
+
+            
+            if(opts.UploadFlag)
+            {
+                blogHandler.UploadPicture(opts.MarkdownFilePath);
             }
             
             if(!string.IsNullOrWhiteSpace(opts.JsonFilePath))
@@ -49,38 +53,14 @@ namespace BlogPublishTool
             if(opts.PublishFlag)
             {
                 ////publish blog here
+                blogHandler.PublishBlog(opts.MarkdownFilePath);
             }
 
 
-            Console.ReadKey();
+            //Console.ReadKey();
             
         }
-        public static SecureString ReadPassword(string mask = "*")
-        {
-            var password = new SecureString();
-            while (true)
-            {
-                var i = Console.ReadKey(true);
-                if (i.Key == ConsoleKey.Enter)
-                {
-                    Console.WriteLine(); break;
-                }
-                if (i.Key == ConsoleKey.Backspace)
-                {
-                    if (password.Length > 0)
-                    {
-                        password.RemoveAt(password.Length - 1);
-                        Console.Write("\b \b");
-                    }
-                }
-                else
-                {
-                    password.AppendChar(i.KeyChar);
-                    Console.Write(mask);
-                }
-            }
-            return password;
-        }
+        
 
     }
 }

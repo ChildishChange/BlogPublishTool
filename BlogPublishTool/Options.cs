@@ -15,7 +15,7 @@ namespace BlogPublishTool
         public string MarkdownFilePath { get; set; }
 
         [Option('u', "upload", Required = false, Default = false, HelpText = "Upload picture and replace picture file path with URL.")]
-        public bool Upload { get; set; }
+        public bool UploadFlag { get; set; }
 
         [Option('r', "replace", Required = false, HelpText = "Replace relative document path with URL in json file.")]
         public string JsonFilePath { get; set; } 
