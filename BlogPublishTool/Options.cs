@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
-
+/// <summary>
+/// 
+/// </summary>
 namespace BlogPublishTool
 {
     class Options
