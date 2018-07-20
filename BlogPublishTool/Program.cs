@@ -23,16 +23,11 @@ namespace BlogPublishTool
 
         private static void HandleParseError(IEnumerable<Error> errs)
         {
-
             Console.ReadKey();
         }
 
         private static void RunOptionsAndReturnExitCode(Options opts)
         {
-            //login here
-            //除了登录是直接调用bloghandler，其他都是调用mdhandler，mdhandler
-            
-
             BlogHandler blogHandler = null;
             if (opts.UploadFlag||opts.PublishFlag)
             {
@@ -47,20 +42,13 @@ namespace BlogPublishTool
             
             if(!string.IsNullOrWhiteSpace(opts.JsonFilePath))
             {
-                //replace blog urls here
+                BlogHandler.ReplaceBlogUrl(opts.MarkdownFilePath, opts.JsonFilePath);
             }
 
             if(opts.PublishFlag)
             {
-                ////publish blog here
                 blogHandler.PublishBlog(opts.MarkdownFilePath);
             }
-
-
-            //Console.ReadKey();
-            
         }
-        
-
     }
 }

@@ -17,12 +17,9 @@ namespace BlogPublishTool
     {
         private static BlogConnectionInfo connectionInfo;
         
-
         private const string blogUrl = "https://www.cnblogs.com/";
         private const string metaWeblogUrl = "https://rpc.cnblogs.com/metaweblog/";
-
-
-
+        
         public BlogHandler()
         {
             Console.WriteLine("Please input your blog ID:");
@@ -33,9 +30,7 @@ namespace BlogPublishTool
 
             Console.WriteLine("Please input your password:");
             string PassWord = GetPassword();
-
-
-            //用securestring好像有点多此一举。。先用着吧
+            
             connectionInfo = new BlogConnectionInfo(
                 blogUrl + BlogId,
                 metaWeblogUrl + BlogId,
@@ -78,10 +73,51 @@ namespace BlogPublishTool
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="filePath"></param>
-        public void UploadPicture(string filePath)
+        /// <param name="blogFilePath"></param>
+        public void UploadPicture(string blogFilePath)
         {
+            Client blogClient = new Client(connectionInfo);
+            Console.WriteLine("======>START UPLOAD PICTURE<======");
+            var pictureList = MdHandler.ParsePicture(blogFilePath);
 
+            Dictionary<string, string> pictureUrlDic = new Dictionary<string, string>();
+            
+            foreach(string picturePath in pictureList)
+            {
+                if (picturePath.StartsWith("http"))
+                {
+                    Console.WriteLine($"Jump picture:{picturePath}.");
+                    continue;
+                }
+
+                //upload picture
+                try
+                {
+                    string pictureAbsPath = Path.Combine(new FileInfo(blogFilePath).DirectoryName, picturePath);
+                    if (File.Exists(pictureAbsPath))
+                    {
+                        var pictureUrl = blogClient.NewMediaObject(picturePath, "image / jpeg", File.ReadAllBytes(pictureAbsPath));
+
+                        if (!pictureUrlDic.ContainsKey(picturePath))
+                        {
+                            pictureUrlDic.Add(picturePath, pictureUrl.URL);
+                        }
+                        Console.WriteLine($"{picturePath} uploaded");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No such file:{picturePath}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+            }
+
+            MdHandler.ReplacePicWithUrl(blogFilePath,pictureUrlDic);
+            Console.WriteLine("======>END UPLOAD PICTURE<======");
         }
 
         /// <summary>
@@ -89,9 +125,12 @@ namespace BlogPublishTool
         /// </summary>
         /// <param name="blogFilePath"></param>
         /// <param name="jsonFilePath"></param>
-        public void ReplaceBlogUrl(string blogFilePath, string jsonFilePath)
+        public static void ReplaceBlogUrl(string blogFilePath, string jsonFilePath)
         {
+            Console.WriteLine("======>START REPLACE BLOG URL<======");
 
+           
+            Console.WriteLine("======>END REPLACE BLOG URL<======");
         }
 
         /// <summary>
