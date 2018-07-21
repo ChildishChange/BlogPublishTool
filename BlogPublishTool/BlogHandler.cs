@@ -132,7 +132,7 @@ namespace BlogPublishTool
         }
 
         /// <summary>
-        /// 
+        ///  
         /// </summary>
         /// <param name="blogFilePath"></param>
         /// <param name="jsonFilePath"></param>
