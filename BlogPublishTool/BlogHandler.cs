@@ -7,6 +7,8 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using MetaWeblogClient;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// 
@@ -138,8 +140,44 @@ namespace BlogPublishTool
         {
             Console.WriteLine("======>START REPLACE BLOG URL<======");
 
+            const string MatchRule = @"\[.*?\]\((.*?\.md)\)";
+            var linkList = MdHandler.RegexParser(blogFilePath, MatchRule);
+            Dictionary<string, string> blogUrlDic = new Dictionary<string, string>();
+            
+            JArray blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
 
-           
+            Dictionary<string, JObject> blogJsonDic = new Dictionary<string, JObject>();
+
+            foreach (JObject blog in blogJson)
+            {
+                blogJsonDic.Add(blog.Properties().First().Name, blog);
+            }
+
+            foreach (string link in linkList)
+            {
+                if (link.StartsWith("http"))
+                {
+                    Console.WriteLine($"Jump Link:{link}.");
+                    continue;
+                }
+
+                //upload picture
+                try
+                {
+                    string blogUrl = blogJsonDic[link][link]["cnblogs"].ToString();
+                    if (!blogUrlDic.ContainsKey(link))
+                    {
+                        blogUrlDic.Add(link, blogUrl);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+            }
+
+            MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
             Console.WriteLine("======>END REPLACE BLOG URL<======");
         }
 

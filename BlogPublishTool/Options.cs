@@ -11,7 +11,7 @@ namespace BlogPublishTool
 {
     class Options
     {
-        [Value(0, HelpText = "Markdown file path.")]
+        [Value(0, Required = true, HelpText = "Markdown file path.")]
         public string MarkdownFilePath { get; set; }
 
         [Option('u', "upload", Required = false, Default = false, HelpText = "Upload picture and replace picture file path with URL.")]
