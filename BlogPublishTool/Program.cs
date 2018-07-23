@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using CommandLine;
 
 /// <summary>
@@ -14,41 +9,60 @@ namespace BlogPublishTool
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-             .WithParsed(opts => RunOptionsAndReturnExitCode(opts))
-             .WithNotParsed((errs) => HandleParseError(errs));
+            Parser.Default.ParseArguments<PublishOptions, ReplaceOptions>(args)
+                .MapResult(
+                  (PublishOptions opts) => RunPublishOptions(opts),
+                  (ReplaceOptions opts) => RunReplaceOptions(opts),
+                  errs => 1);
         }
 
-        private static void HandleParseError(IEnumerable<Error> errs)
+        private static int RunReplaceOptions(ReplaceOptions opts)
         {
-            Console.ReadKey();
-        }
-
-        private static void RunOptionsAndReturnExitCode(Options opts)
-        {
-            BlogHandler blogHandler = null;
-            if (opts.UploadFlag||opts.PublishFlag)
+            //cnblogs && link
+            if(!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
+               !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                blogHandler = new BlogHandler();
-            }
-
-            
-            if(opts.UploadFlag)
-            {
-                blogHandler.UploadPicture(opts.MarkdownFilePath);
+                BlogHandler.ReplaceBlogUrl(opts.CnblogsFilePath, opts.LinkJsonPath, "cnblogs");
             }
             
-            if(!string.IsNullOrWhiteSpace(opts.JsonFilePath))
+            //csdn && link
+            if (!string.IsNullOrWhiteSpace(opts.CsdnFilePath) &&
+               !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                BlogHandler.ReplaceBlogUrl(opts.MarkdownFilePath, opts.JsonFilePath);
+                BlogHandler.ReplaceBlogUrl(opts.CsdnFilePath, opts.LinkJsonPath, "csdn");
+            }
+            
+            //cnblogs && picture
+            if (!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
+                opts.PictureFlag)
+            {
+                BlogHandler blogHandler = new BlogHandler();
+
+                blogHandler.UploadPicture(opts.CnblogsFilePath);
             }
 
-            if(opts.PublishFlag)
+            //csdn && picture
+            if (!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
+                opts.PictureFlag)
             {
-                blogHandler.PublishBlog(opts.MarkdownFilePath);
+                Console.WriteLine("Sorry, replace picture function only supports cnblogs.");
             }
+            
+            return 0;
         }
+
+        private static int RunPublishOptions(PublishOptions opts)
+        {
+            if(!string.IsNullOrWhiteSpace(opts.CnblogsFilePath))
+            {
+                BlogHandler blogHandler = new BlogHandler();
+
+                blogHandler.PublishBlog(opts.CnblogsFilePath);
+            }
+            return 0;
+        }
+        
     }
 }

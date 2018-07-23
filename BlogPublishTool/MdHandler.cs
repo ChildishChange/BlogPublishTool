@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 /// <summary>
 /// 
 /// </summary>
@@ -25,18 +24,20 @@ namespace BlogPublishTool
         }
 
 
-        public static void ReplaceContentWithUrl(string resBlogFilePath, Dictionary<string, string> contentUrlDic)
+        public static string ReplaceContentWithUrl(string resBlogFilePath, Dictionary<string, string> contentUrlDic)
         {
             StringBuilder blogContent = new StringBuilder(File.ReadAllText(resBlogFilePath)); 
             foreach (KeyValuePair<string,string> pathUrlPair in contentUrlDic)
             {
                 blogContent = blogContent.Replace(pathUrlPair.Key, pathUrlPair.Value);
             }
-            //Console.WriteLine(blogContent);
-
-            File.WriteAllText(resBlogFilePath,blogContent.ToString());
+            return blogContent.ToString();
         }
 
-        
+        public static void WriteFile(string blogFilePath, string blogPlatform, string blogContent)
+        {
+            FileInfo fileInfo = new FileInfo(blogFilePath);
+            File.WriteAllText(Path.Combine(fileInfo.DirectoryName,fileInfo.Name.Replace(fileInfo.Extension,"")+"-"+blogPlatform+fileInfo.Extension), blogContent);
+        }
     }
 }

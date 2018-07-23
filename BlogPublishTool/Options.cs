@@ -1,28 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandLine;
+﻿using CommandLine;
+
 /// <summary>
 /// 
 /// </summary>
 namespace BlogPublishTool
 {
-    class Options
-    {
-        [Value(0, Required = true, HelpText = "Markdown file path.")]
-        public string MarkdownFilePath { get; set; }
+    [Verb("publish", HelpText = "Publish the blog file to the specified blog platform.")]
+    public class PublishOptions
+    {   
+        [Option("cnblogs", Required = true, HelpText = "Publish the blog on cnblogs.")]
+        public string CnblogsFilePath { get; set; }
 
-        [Option('u', "upload", Required = false, Default = false, HelpText = "Upload picture and replace picture file path with URL.")]
-        public bool UploadFlag { get; set; }
-
-        [Option('r', "replace", Required = false, HelpText = "Replace relative document path with URL in json file.")]
-        public string JsonFilePath { get; set; } 
-
-        [Option('p', "publish", Required = false, Default = false, HelpText = "Publish this blog in Markdown format.")]
-        public bool PublishFlag { get; set; }
-        
+        //TBD
+        //[Option("csdn", Required = false, Default = false, HelpText = "Publish the blog on csdn.")]
+        //public string CsdnFilePath { get; }
     }
 
+    [Verb("replace", HelpText = "Replace link of picture in the blog")]
+    public class ReplaceOptions
+    {
+        [Option("picture", Required = false, Default = false, HelpText = "Upload and replace picture with URL.")]
+        public bool PictureFlag { get; set; }
+        
+        [Option("link", Required = false, HelpText = "Replace link with URL.")]
+        public string LinkJsonPath { get; set; }
+        
+        [Option("cnblogs", Required = false, HelpText = "Replace the link with blog on cnblogs.")]
+        public string CnblogsFilePath { get; set; }
+
+        [Option("csdn", Required = false, HelpText = "Replace the link with the blog on csdn.")]
+        public string CsdnFilePath { get; set; }
+    }
 }

@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 using MetaWeblogClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -75,10 +72,7 @@ namespace BlogPublishTool
             }
             return password.ToString();
         }
-
-
-
-
+    
         /// <summary>
         /// 
         /// </summary>
@@ -124,10 +118,10 @@ namespace BlogPublishTool
                 {
                     Console.WriteLine(e.Message);
                 }
-
             }
 
-            MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
+            string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
+            MdHandler.WriteFile(blogFilePath, "cnblogs", blogContent);
             Console.WriteLine("======>END UPLOAD PICTURE<======");
         }
 
@@ -136,7 +130,7 @@ namespace BlogPublishTool
         /// </summary>
         /// <param name="blogFilePath"></param>
         /// <param name="jsonFilePath"></param>
-        public static void ReplaceBlogUrl(string blogFilePath, string jsonFilePath)
+        public static void ReplaceBlogUrl(string blogFilePath, string jsonFilePath, string blogPlatform)
         {
             Console.WriteLine("======>START REPLACE BLOG URL<======");
 
@@ -164,7 +158,7 @@ namespace BlogPublishTool
                 //upload picture
                 try
                 {
-                    string blogUrl = blogJsonDic[link][link]["cnblogs"].ToString();
+                    string blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
                     if (!blogUrlDic.ContainsKey(link))
                     {
                         blogUrlDic.Add(link, blogUrl);
@@ -177,7 +171,11 @@ namespace BlogPublishTool
 
             }
 
-            MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
+            string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
+
+            //添加写入文件的部分
+            MdHandler.WriteFile(blogFilePath, blogPlatform, blogContent);
+            
             Console.WriteLine("======>END REPLACE BLOG URL<======");
         }
 
