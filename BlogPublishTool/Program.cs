@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using CommandLine;
 
 /// <summary>
@@ -20,18 +22,28 @@ namespace BlogPublishTool
 
         private static int RunReplaceOptions(ReplaceOptions opts)
         {
-            //cnblogs && link
-            if(!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
+            
+            //默认是文件
+            opts.CnblogsFilePath = PathHandler.GetAbsPath(opts.CnblogsFilePath);
+            opts.CsdnFilePath = PathHandler.GetAbsPath(opts.CsdnFilePath);
+            opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath);
+
+            //可以是文件也可以是文件夹
+            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
+            opts.OutputPath = PathHandler.GetAbsPath(opts.InputPath);
+            
+            //cnblogs && config
+            if (!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                BlogHandler.ReplaceBlogUrl(opts.CnblogsFilePath, opts.LinkJsonPath, "cnblogs");
+                BlogHandler.ReplaceBlogUrl(opts.CnblogsFilePath, new FileInfo(opts.CnblogsFilePath).DirectoryName, opts.LinkJsonPath, "cnblogs");
             }
-            
-            //csdn && link
+
+            //csdn && config
             if (!string.IsNullOrWhiteSpace(opts.CsdnFilePath) &&
                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                BlogHandler.ReplaceBlogUrl(opts.CsdnFilePath, opts.LinkJsonPath, "csdn");
+                BlogHandler.ReplaceBlogUrl(opts.CsdnFilePath, new FileInfo(opts.CsdnFilePath).DirectoryName, opts.LinkJsonPath, "csdn");
             }
             
             //cnblogs && picture
@@ -50,6 +62,22 @@ namespace BlogPublishTool
                 Console.WriteLine("Sorry, replace picture function only supports cnblogs.");
             }
             
+            //input output config
+            if(!string.IsNullOrWhiteSpace(opts.InputPath) &&
+               !string.IsNullOrWhiteSpace(opts.OutputPath) &&
+               !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
+            {
+                List<string> markDownList = new List<string>();
+
+                markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
+
+                foreach (string markDownPath in markDownList)
+                {
+                    BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
+                    BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
+                }
+            }
+
             return 0;
         }
 

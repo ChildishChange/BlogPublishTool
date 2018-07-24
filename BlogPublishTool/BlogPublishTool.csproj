@@ -63,6 +63,7 @@
     <Compile Include="BlogHandler.cs" />
     <Compile Include="MdHandler.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="PathHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

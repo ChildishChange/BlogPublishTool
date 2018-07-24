@@ -121,7 +121,7 @@ namespace BlogPublishTool
             }
 
             string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
-            MdHandler.WriteFile(blogFilePath, "cnblogs", blogContent);
+            MdHandler.WriteFile(blogFilePath, new FileInfo(blogFilePath).DirectoryName, "cnblogs", blogContent);
             Console.WriteLine("======>END UPLOAD PICTURE<======");
         }
 
@@ -130,18 +130,14 @@ namespace BlogPublishTool
         /// </summary>
         /// <param name="blogFilePath"></param>
         /// <param name="jsonFilePath"></param>
-        public static void ReplaceBlogUrl(string blogFilePath, string jsonFilePath, string blogPlatform)
+        public static void ReplaceBlogUrl(string blogFilePath, string outDirPath, string jsonFilePath, string blogPlatform)
         {
             Console.WriteLine("======>START REPLACE BLOG URL<======");
-
             const string MatchRule = @"\[.*?\]\((.*?\.md)\)";
             var linkList = MdHandler.RegexParser(blogFilePath, MatchRule);
             Dictionary<string, string> blogUrlDic = new Dictionary<string, string>();
-            
             JArray blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
-
             Dictionary<string, JObject> blogJsonDic = new Dictionary<string, JObject>();
-
             foreach (JObject blog in blogJson)
             {
                 blogJsonDic.Add(blog.Properties().First().Name, blog);
@@ -154,8 +150,6 @@ namespace BlogPublishTool
                     Console.WriteLine($"Jump Link:{link}.");
                     continue;
                 }
-
-                //upload picture
                 try
                 {
                     string blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
@@ -168,14 +162,12 @@ namespace BlogPublishTool
                 {
                     Console.WriteLine(e.Message);
                 }
-
             }
-
             string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
-            //添加写入文件的部分
-            MdHandler.WriteFile(blogFilePath, blogPlatform, blogContent);
-            
+
+
+            MdHandler.WriteFile(blogFilePath, outDirPath, blogPlatform, blogContent);
             Console.WriteLine("======>END REPLACE BLOG URL<======");
         }
 
@@ -198,6 +190,9 @@ namespace BlogPublishTool
             Console.WriteLine("Blog published here: "+ connectionInfo.BlogURL+"/p/"+postID+".html");
             Console.WriteLine("======>END PUBLISH BLOG<======");
         }
+
+
+
 
     }
 }

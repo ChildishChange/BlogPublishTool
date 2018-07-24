@@ -22,8 +22,7 @@ namespace BlogPublishTool
             }
             return parseList;
         }
-
-
+        
         public static string ReplaceContentWithUrl(string resBlogFilePath, Dictionary<string, string> contentUrlDic)
         {
             StringBuilder blogContent = new StringBuilder(File.ReadAllText(resBlogFilePath)); 
@@ -34,10 +33,10 @@ namespace BlogPublishTool
             return blogContent.ToString();
         }
 
-        public static void WriteFile(string blogFilePath, string blogPlatform, string blogContent)
+        public static void WriteFile(string blogFilePath, string outBlogFilePath, string blogPlatform, string blogContent)
         {
             FileInfo fileInfo = new FileInfo(blogFilePath);
-            File.WriteAllText(Path.Combine(fileInfo.DirectoryName,fileInfo.Name.Replace(fileInfo.Extension,"")+"-"+blogPlatform+fileInfo.Extension), blogContent);
+            File.WriteAllText(Path.Combine(outBlogFilePath,fileInfo.Name.Replace(fileInfo.Extension,"")+"-"+blogPlatform+fileInfo.Extension), blogContent);
         }
     }
 }
