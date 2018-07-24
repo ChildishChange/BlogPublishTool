@@ -17,6 +17,7 @@ namespace BlogPublishTool
                 .MapResult(
                   (PublishOptions opts) => RunPublishOptions(opts),
                   (ReplaceOptions opts) => RunReplaceOptions(opts),
+                  (UploadPicOptions opts)=> RunUploadPicOptions(opts),
                   errs => 1);
         }
 
@@ -30,7 +31,7 @@ namespace BlogPublishTool
 
             //可以是文件也可以是文件夹
             opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
-            opts.OutputPath = PathHandler.GetAbsPath(opts.InputPath);
+            opts.OutputPath = PathHandler.GetAbsPath(opts.OutputPath);
             
             //cnblogs && config
             if (!string.IsNullOrWhiteSpace(opts.CnblogsFilePath) &&
@@ -69,8 +70,15 @@ namespace BlogPublishTool
             {
                 List<string> markDownList = new List<string>();
 
-                markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
-
+                if(new FileInfo(opts.InputPath).Attributes == FileAttributes.Directory)
+                {
+                    markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
+                }
+                else
+                {
+                    markDownList.Add(opts.InputPath);
+                }
+                
                 foreach (string markDownPath in markDownList)
                 {
                     BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
@@ -89,6 +97,40 @@ namespace BlogPublishTool
 
                 blogHandler.PublishBlog(opts.CnblogsFilePath);
             }
+            return 0;
+        }
+
+        private static int RunUploadPicOptions(UploadPicOptions opts)
+        {
+            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
+
+            List<string> markDownList = new List<string>();
+
+            if (new FileInfo(opts.InputPath).Attributes == FileAttributes.Directory)
+            {
+                markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
+            }
+            else
+            {
+                markDownList.Add(opts.InputPath);
+            }
+            
+            if (opts.TestFlag)
+            {
+                foreach (string markDownPath in markDownList)
+                {
+
+                }
+            }
+            else
+            {
+                BlogHandler blogHandler = new BlogHandler();
+                foreach (string markDownPath in markDownList)
+                {
+                    blogHandler.UploadPicture(markDownPath);
+                }
+            }
+
             return 0;
         }
         

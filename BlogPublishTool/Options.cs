@@ -10,10 +10,16 @@ namespace BlogPublishTool
     {   
         [Option("cnblogs", Required = true, HelpText = "Publish the blog on cnblogs.")]
         public string CnblogsFilePath { get; set; }
+    }
 
-        //TBD
-        //[Option("csdn", Required = false, Default = false, HelpText = "Publish the blog on csdn.")]
-        //public string CsdnFilePath { get; }
+    [Verb("uploadpic", HelpText = "Upload and replace picture with URL.")]
+    public class UploadPicOptions
+    {
+        [Option("input", Required = true, HelpText = "Input path, file or directory.")]
+        public string InputPath { get; set; }
+
+        [Option("test", Required = false, Default = false, HelpText = "Not upload, only show all picture need to replace.")]
+        public bool TestFlag { get; set; }
     }
 
     [Verb("replace", HelpText = "Replace link of picture in the blog")]
