@@ -12,9 +12,8 @@ namespace BlogPublishTool
             if (path == null) return null;
             try
             {
-                string absPath;
                 //判断是否是根目录
-                absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
+                var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
 
                 var fileInfo = new FileInfo(absPath);
 

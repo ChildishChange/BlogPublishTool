@@ -12,6 +12,7 @@ namespace BlogPublishTool
     public class BlogHandler
     {
         private static BlogConnectionInfo _connectionInfo;
+        private static Dictionary<string, string> _picFileTable;
         
         private const string BlogUrl = "https://www.cnblogs.com/";
         private const string MetaWeblogUrl = "https://rpc.cnblogs.com/metaweblog/";
@@ -36,13 +37,26 @@ namespace BlogPublishTool
                 blogId,
                 userName,
                 passWord);
+            InitPicFileTable();
         }
 
+        private void InitPicFileTable()
+        {
+            _picFileTable = new Dictionary<string, string>
+            {
+                { ".bmp", "image/bmp" },
+                { ".gif", "image/gif" },
+                { ".ico", "image/x-icon" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".png", "image/png" }
+            };
+        }
          /// <summary>
          /// 
          /// </summary>
          /// <returns></returns>
-        private static string GetPassword()
+        public static string GetPassword()
         {
             var password = new StringBuilder();
             while (true)
@@ -108,7 +122,8 @@ namespace BlogPublishTool
                     {
                         if(!testFlag)
                         {
-                            var pictureUrl = blogClient.NewMediaObject(picturePath, "image / jpeg", File.ReadAllBytes(pictureAbsPath));
+                            //这里需要改一下
+                            var pictureUrl = blogClient.NewMediaObject(picturePath, _picFileTable[new FileInfo(picturePath).Extension.ToLower()], File.ReadAllBytes(pictureAbsPath));
 
                             if (!pictureUrlDic.ContainsKey(picturePath))
                             {
@@ -198,7 +213,7 @@ namespace BlogPublishTool
             var blogClient = new Client(_connectionInfo);
             Console.WriteLine("======>START PUBLISH BLOG<======");
 
-            Console.WriteLine("Please input title of this blog:");
+            Console.WriteLine("Please input title of this blog:{0}", blogFilePath);
             var blogTitle = Console.ReadLine();
             
             var blogContent = File.ReadAllText(blogFilePath);
