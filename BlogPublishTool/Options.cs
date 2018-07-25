@@ -1,8 +1,5 @@
 ﻿using CommandLine;
 
-/// <summary>
-/// 
-/// </summary>
 namespace BlogPublishTool
 {
     [Verb("publish", HelpText = "Publish the blog file to the specified blog platform.")]

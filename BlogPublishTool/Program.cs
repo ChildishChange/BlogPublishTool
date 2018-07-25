@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using CommandLine;
 
-/// <summary>
-/// 
-/// 
-/// </summary>
 namespace BlogPublishTool
 {
-    class Program
+    public class Program
     {
         public static void Main(string[] args)
         {

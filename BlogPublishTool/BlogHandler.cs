@@ -7,17 +7,14 @@ using MetaWeblogClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-/// <summary>
-/// 
-/// </summary>
 namespace BlogPublishTool
 {
     public class BlogHandler
     {
-        private static BlogConnectionInfo connectionInfo;
+        private static BlogConnectionInfo _connectionInfo;
         
-        private const string blogUrl = "https://www.cnblogs.com/";
-        private const string metaWeblogUrl = "https://rpc.cnblogs.com/metaweblog/";
+        private const string BlogUrl = "https://www.cnblogs.com/";
+        private const string MetaWeblogUrl = "https://rpc.cnblogs.com/metaweblog/";
         
         /// <summary>
         /// 
@@ -25,20 +22,20 @@ namespace BlogPublishTool
         public BlogHandler()
         {
             Console.WriteLine("Please input your blog ID:");
-            string BlogId = Console.ReadLine();
+            var blogId = Console.ReadLine();
 
             Console.WriteLine("Please input your user name:");
-            string UserName = Console.ReadLine();
+            var userName = Console.ReadLine();
 
             Console.WriteLine("Please input your password:");
-            string PassWord = GetPassword();
+            var passWord = GetPassword();
             
-            connectionInfo = new BlogConnectionInfo(
-                blogUrl + BlogId,
-                metaWeblogUrl + BlogId,
-                BlogId,
-                UserName,
-                PassWord);
+            _connectionInfo = new BlogConnectionInfo(
+                BlogUrl + blogId,
+                MetaWeblogUrl + blogId,
+                blogId,
+                userName,
+                passWord);
         }
 
          /// <summary>
@@ -50,48 +47,51 @@ namespace BlogPublishTool
             var password = new StringBuilder();
             while (true)
             {
-                ConsoleKeyInfo i = Console.ReadKey(true);
+                var i = Console.ReadKey(true);
                 if (i.Key == ConsoleKey.Enter)
                 {
                     Console.Write('\n');
                     break;
                 }
-                else if (i.Key == ConsoleKey.Backspace)
+
+                // ReSharper disable once SwitchStatementMissingSomeCases
+                switch (i.Key)
                 {
-                    if (password.Length > 0)
-                    {
+                    case ConsoleKey.Backspace when password.Length <= 0:
+                        continue;
+                    case ConsoleKey.Backspace:
                         password.Remove(password.Length - 1,1);
                         Console.Write("\b \b");
-                    }
-                }
-                else
-                {
-                    password.Append(i.KeyChar);
-                    Console.Write("*");
+                        break;
+                    default:
+                        password.Append(i.KeyChar);
+                        Console.Write("*");
+                        break;
                 }
             }
             return password.ToString();
         }
-    
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="blogFilePath"></param>
+        /// <param name="testFlag"></param>
         public void UploadPicture(string blogFilePath, bool testFlag)
         {
             Console.WriteLine("======>START UPLOAD PICTURE<======");
 
-            const string MatchRule = @"!\[.*?\]\((.*?)\)";
-            var pictureList = MdHandler.RegexParser(blogFilePath, MatchRule);
-            Dictionary<string, string> pictureUrlDic = new Dictionary<string, string>();
+            const string matchRule = @"!\[.*?\]\((.*?)\)";
+            var pictureList = MdHandler.RegexParser(blogFilePath, matchRule);
+            var pictureUrlDic = new Dictionary<string, string>();
 
             Client blogClient = null;
             if (!testFlag)
             {
-                blogClient = new Client(connectionInfo);
+                blogClient = new Client(_connectionInfo);
             }
 
-            foreach (string picturePath in pictureList)
+            foreach (var picturePath in pictureList)
             {
                 if (picturePath.StartsWith("http"))
                 {
@@ -102,7 +102,8 @@ namespace BlogPublishTool
                 //upload picture
                 try
                 {
-                    string pictureAbsPath = Path.Combine(new FileInfo(blogFilePath).DirectoryName, picturePath);
+                    // ReSharper disable once AssignNullToNotNullAttribute
+                    var pictureAbsPath = Path.Combine(new FileInfo(blogFilePath).DirectoryName, picturePath);
                     if (File.Exists(pictureAbsPath))
                     {
                         if(!testFlag)
@@ -132,7 +133,7 @@ namespace BlogPublishTool
             }
             if(!testFlag)
             {
-                string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
+                var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
                 MdHandler.WriteFile(blogFilePath, new FileInfo(blogFilePath).DirectoryName, "", blogContent);
             }
             
@@ -143,21 +144,24 @@ namespace BlogPublishTool
         ///  
         /// </summary>
         /// <param name="blogFilePath"></param>
+        /// <param name="outDirPath"></param>
         /// <param name="jsonFilePath"></param>
+        /// <param name="blogPlatform"></param>
         public static void ReplaceBlogUrl(string blogFilePath, string outDirPath, string jsonFilePath, string blogPlatform)
         {
             Console.WriteLine("======>START REPLACE BLOG URL<======");
-            const string MatchRule = @"\[.*?\]\((.*?\.md)\)";
-            var linkList = MdHandler.RegexParser(blogFilePath, MatchRule);
-            Dictionary<string, string> blogUrlDic = new Dictionary<string, string>();
-            JArray blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
-            Dictionary<string, JObject> blogJsonDic = new Dictionary<string, JObject>();
-            foreach (JObject blog in blogJson)
+            const string matchRule = @"\[.*?\]\((.*?\.md)\)";
+            var linkList = MdHandler.RegexParser(blogFilePath, matchRule);
+            var blogUrlDic = new Dictionary<string, string>();
+            var blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
+            var blogJsonDic = new Dictionary<string, JObject>();
+            foreach (var jToken in blogJson)
             {
+                var blog = (JObject) jToken;
                 blogJsonDic.Add(blog.Properties().First().Name, blog);
             }
 
-            foreach (string link in linkList)
+            foreach (var link in linkList)
             {
                 if (link.StartsWith("http"))
                 {
@@ -166,7 +170,7 @@ namespace BlogPublishTool
                 }
                 try
                 {
-                    string blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
+                    var blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
                     if (!blogUrlDic.ContainsKey(link))
                     {
                         blogUrlDic.Add(link, blogUrl);
@@ -177,7 +181,7 @@ namespace BlogPublishTool
                     Console.WriteLine(e.Message);
                 }
             }
-            string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
+            var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
 
 
@@ -191,17 +195,17 @@ namespace BlogPublishTool
         /// <param name="blogFilePath"></param>
         public void PublishBlog(string blogFilePath)
         {
-            Client blogClient = new Client(connectionInfo);
+            var blogClient = new Client(_connectionInfo);
             Console.WriteLine("======>START PUBLISH BLOG<======");
 
             Console.WriteLine("Please input title of this blog:");
-            string blogTitle = Console.ReadLine();
+            var blogTitle = Console.ReadLine();
             
-            string blogContent = File.ReadAllText(blogFilePath);
+            var blogContent = File.ReadAllText(blogFilePath);
 
-            var postID = blogClient.NewPost(blogTitle, blogContent, new List<string>(){"[Markdown]"}, true, DateTime.Now);
+            var postId = blogClient.NewPost(blogTitle, blogContent, new List<string> {"[Markdown]"}, true, DateTime.Now);
 
-            Console.WriteLine("Blog published here: "+ connectionInfo.BlogURL+"/p/"+postID+".html");
+            Console.WriteLine("Blog published here: "+ _connectionInfo.BlogURL+"/p/"+postId+".html");
             Console.WriteLine("======>END PUBLISH BLOG<======");
         }
 
