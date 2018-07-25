@@ -77,17 +77,21 @@ namespace BlogPublishTool
         /// 
         /// </summary>
         /// <param name="blogFilePath"></param>
-        public void UploadPicture(string blogFilePath)
+        public void UploadPicture(string blogFilePath, bool testFlag)
         {
-            Client blogClient = new Client(connectionInfo);
             Console.WriteLine("======>START UPLOAD PICTURE<======");
 
             const string MatchRule = @"!\[.*?\]\((.*?)\)";
             var pictureList = MdHandler.RegexParser(blogFilePath, MatchRule);
-
             Dictionary<string, string> pictureUrlDic = new Dictionary<string, string>();
-            
-            foreach(string picturePath in pictureList)
+
+            Client blogClient = null;
+            if (!testFlag)
+            {
+                blogClient = new Client(connectionInfo);
+            }
+
+            foreach (string picturePath in pictureList)
             {
                 if (picturePath.StartsWith("http"))
                 {
@@ -101,13 +105,20 @@ namespace BlogPublishTool
                     string pictureAbsPath = Path.Combine(new FileInfo(blogFilePath).DirectoryName, picturePath);
                     if (File.Exists(pictureAbsPath))
                     {
-                        var pictureUrl = blogClient.NewMediaObject(picturePath, "image / jpeg", File.ReadAllBytes(pictureAbsPath));
-
-                        if (!pictureUrlDic.ContainsKey(picturePath))
+                        if(!testFlag)
                         {
-                            pictureUrlDic.Add(picturePath, pictureUrl.URL);
+                            var pictureUrl = blogClient.NewMediaObject(picturePath, "image / jpeg", File.ReadAllBytes(pictureAbsPath));
+
+                            if (!pictureUrlDic.ContainsKey(picturePath))
+                            {
+                                pictureUrlDic.Add(picturePath, pictureUrl.URL);
+                            }
+                            Console.WriteLine($"{picturePath} uploaded");
                         }
-                        Console.WriteLine($"{picturePath} uploaded");
+                        else
+                        {
+                            Console.WriteLine($"{picturePath} need upload.");
+                        }
                     }
                     else
                     {
@@ -119,9 +130,12 @@ namespace BlogPublishTool
                     Console.WriteLine(e.Message);
                 }
             }
-
-            string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
-            MdHandler.WriteFile(blogFilePath, new FileInfo(blogFilePath).DirectoryName, "cnblogs", blogContent);
+            if(!testFlag)
+            {
+                string blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, pictureUrlDic);
+                MdHandler.WriteFile(blogFilePath, new FileInfo(blogFilePath).DirectoryName, "", blogContent);
+            }
+            
             Console.WriteLine("======>END UPLOAD PICTURE<======");
         }
 

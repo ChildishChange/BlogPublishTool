@@ -36,7 +36,7 @@ namespace BlogPublishTool
         public static void WriteFile(string blogFilePath, string outBlogFilePath, string blogPlatform, string blogContent)
         {
             FileInfo fileInfo = new FileInfo(blogFilePath);
-            File.WriteAllText(Path.Combine(outBlogFilePath,fileInfo.Name.Replace(fileInfo.Extension,"")+"-"+blogPlatform+fileInfo.Extension), blogContent);
+            File.WriteAllText(Path.Combine(outBlogFilePath,fileInfo.Name.Replace(fileInfo.Extension,"")+blogPlatform+fileInfo.Extension), blogContent);
         }
     }
 }
