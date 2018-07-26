@@ -4,9 +4,15 @@ namespace BlogPublishTool
 {
     [Verb("publish", HelpText = "Publish the blog file to the specified blog platform.")]
     public class PublishOptions
-    {   
-        [Option("cnblogs", Required = true, HelpText = "Publish the blog on cnblogs.")]
-        public string CnblogsFilePath { get; set; }
+    {
+        [Option("input", Required = true, HelpText = "Input path, file or directory.")]
+        public string InputPath { get; set; }
+
+        [Option("cnblogs", Required = false, HelpText = "Publish the blog on cnblogs.")]
+        public bool CnblogsFlag { get; set; }
+
+        [Option("config", Required = true, HelpText = "Config json file path.")]
+        public string LinkJsonPath { get; set; }
     }
     
     
@@ -14,22 +20,13 @@ namespace BlogPublishTool
     [Verb("replace", HelpText = "Replace link of picture in the blog.")]
     public class ReplaceOptions
     {
-        [Option("picture", Required = false, Default = false, HelpText = "Upload and replace picture with URL.")]
-        public bool PictureFlag { get; set; }
-        
-        [Option("cnblogs", Required = false, HelpText = "Replace the link with blog on cnblogs.")]
-        public string CnblogsFilePath { get; set; }
-
-        [Option("csdn", Required = false, HelpText = "Replace the link with the blog on csdn.")]
-        public string CsdnFilePath { get; set; }
-
-        [Option("config", Required = false, HelpText = "Config json file path.")]
+        [Option("config", Required = true, HelpText = "Config json file path.")]
         public string LinkJsonPath { get; set; }
 
-        [Option("input", Required = false, HelpText = "Input path, file or directory.")]
+        [Option("input", Required = true, HelpText = "Input path, file or directory.")]
         public string InputPath { get; set; }
 
-        [Option("output", Required = false, HelpText = "Output path, file or directory.")]
+        [Option("output", Required = false, HelpText = "Output directory path.")]
         public string OutputPath { get; set; }
     }
 
