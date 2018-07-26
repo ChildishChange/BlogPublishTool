@@ -32,25 +32,11 @@ namespace BlogPublishTool
 
         public static void WriteFile(string blogFilePath, string outDirPath, string blogPlatform, string blogContent)
         {
-            var directoryInfo = new DirectoryInfo(outDirPath);
-            var files = directoryInfo.GetFiles();
+
 
             var fileInfo = new FileInfo(blogFilePath);
-            //如果当前要写入的目录下已经有一个跟目标文件同名的文件，就把名字设为目标文件的名字，否则就在后面加上platform
-            if (files.Contains(
-                new FileInfo(
-                    Path.Combine(
-                    outDirPath, fileInfo.Name))))
-            {
-                File.WriteAllText(Path.Combine(outDirPath, fileInfo.Name), blogContent);
-            }
-            else
-            {
-                File.WriteAllText(Path.Combine(outDirPath, fileInfo.Name.Replace(fileInfo.Extension, "") + blogPlatform + fileInfo.Extension), blogContent);
-            }
-            
-            
-            
+
+            File.WriteAllText(Path.Combine(outDirPath, fileInfo.Name.Replace(fileInfo.Extension, blogPlatform + fileInfo.Extension)), blogContent);
         }
     }
 }

@@ -12,12 +12,10 @@ namespace BlogPublishTool
             if (path == null) return null;
             try
             {
-                //判断是否是根目录
                 var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
 
                 var fileInfo = new FileInfo(absPath);
 
-                //是个文件夹
                 if (fileInfo.Attributes == FileAttributes.Directory)
                 {
                     var directoryInfo = new DirectoryInfo(absPath);

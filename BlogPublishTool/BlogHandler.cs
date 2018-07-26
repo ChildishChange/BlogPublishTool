@@ -216,8 +216,8 @@ namespace BlogPublishTool
                 var postId = blogUrl.Replace(_connectionInfo.BlogURL + "/p/", "").Replace(".html","");
 
 
-                Console.WriteLine("[INFO]This blogs has been published before:\n{0}", blogFilePath);
-                Console.WriteLine("[INFO]START PUBLISH BLOG");
+                Console.WriteLine("[INFO]This blogs has been published before:\n" + blogFilePath);
+                Console.WriteLine("[INFO]START BLOG EDITTING");
                 blogClient.EditPost(postId,
                                     blogJsonDic[fileInfo.Name][fileInfo.Name]["title"].ToString(),
                                     blogContent,
@@ -228,9 +228,10 @@ namespace BlogPublishTool
             else
             {
                 Console.WriteLine("[INFO]START PUBLISH BLOG\n");
-                Console.WriteLine("[INFO]Please input title of this blog:\n{0}", blogFilePath);
+                Console.WriteLine("[INFO]Please input title of this blog:\n" + blogFilePath);
                 var blogTitle = Console.ReadLine();
-                //没找到则用newpost，并且修改
+
+
                 var postId = blogClient.NewPost(blogTitle, blogContent, new List<string> { "[Markdown]" }, true, DateTime.Now);
                 var blogUrl = _connectionInfo.BlogURL + "/p/" + postId + ".html";
                 Console.WriteLine("[INFO]Blog published here: " + blogUrl);

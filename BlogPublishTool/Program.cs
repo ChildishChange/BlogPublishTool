@@ -80,7 +80,11 @@ namespace BlogPublishTool
                     foreach (var markDownPath in markDownList)
                     {
                         BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
+                        if(!markDownPath.EndsWith("-csdn.md"))
+                        {
+                           BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
+                        }
+                        
                     }
                 }
                 else
@@ -88,7 +92,10 @@ namespace BlogPublishTool
                     foreach (var markDownPath in markDownList)
                     {
                         BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
+                        if (!markDownPath.EndsWith("-csdn.md"))
+                        {
+                            BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
+                        }
                     }
                 }
                 
@@ -120,7 +127,7 @@ namespace BlogPublishTool
 
                 foreach (var markDownPath in markDownList)
                 {
-                    if(!markDownPath.Contains("-csdn"))
+                    if(!markDownPath.EndsWith("-csdn.md"))
                     {
                         blogHandler.PublishBlog(markDownPath,opts.LinkJsonPath);
                     }
