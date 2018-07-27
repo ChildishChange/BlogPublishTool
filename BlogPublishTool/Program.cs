@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using CommandLine;
 
 namespace BlogPublishTool
@@ -23,16 +21,7 @@ namespace BlogPublishTool
             
             if(!string.IsNullOrWhiteSpace(opts.InputPath))
             {
-                var markDownList = new List<string>();
-
-                if (new FileInfo(opts.InputPath).Attributes == FileAttributes.Directory)
-                {
-                    markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
-                }
-                else
-                {
-                    markDownList.Add(opts.InputPath);
-                }
+                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 var blogHandler = new BlogHandler();
                 if (opts.TestFlag)
@@ -64,26 +53,14 @@ namespace BlogPublishTool
             if (!string.IsNullOrWhiteSpace(opts.InputPath) &&
                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                var markDownList = new List<string>();
-
-                if(new FileInfo(opts.InputPath).Attributes == FileAttributes.Directory)
-                {
-                    markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
-                }
-                else
-                {
-                    markDownList.Add(opts.InputPath);
-                }
+                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 if (!string.IsNullOrWhiteSpace(opts.OutputPath))
                 {
                     foreach (var markDownPath in markDownList)
                     {
                         BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
-                        if(!markDownPath.EndsWith("-csdn.md"))
-                        {
-                           BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
-                        }
+                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
                         
                     }
                 }
@@ -92,10 +69,7 @@ namespace BlogPublishTool
                     foreach (var markDownPath in markDownList)
                     {
                         BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "cnblogs");
-                        if (!markDownPath.EndsWith("-csdn.md"))
-                        {
-                            BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
-                        }
+                        BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
                     }
                 }
                 
@@ -114,16 +88,8 @@ namespace BlogPublishTool
                 !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
                 var blogHandler = new BlogHandler();
-                var markDownList = new List<string>();
 
-                if (new FileInfo(opts.InputPath).Attributes == FileAttributes.Directory)
-                {
-                    markDownList = PathHandler.GetAllMarkDown(opts.InputPath, markDownList);
-                }
-                else
-                {
-                    markDownList.Add(opts.InputPath);
-                }
+                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 foreach (var markDownPath in markDownList)
                 {

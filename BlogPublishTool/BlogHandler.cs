@@ -62,8 +62,7 @@ namespace BlogPublishTool
                     Console.Write('\n');
                     break;
                 }
-
-                // ReSharper disable once SwitchStatementMissingSomeCases
+                
                 switch (i.Key)
                 {
                     case ConsoleKey.Backspace when password.Length <= 0:
@@ -103,11 +102,9 @@ namespace BlogPublishTool
                     Console.WriteLine($"[INFO]Jump picture:{picturePath}");
                     continue;
                 }
-
-                //upload picture
+                
                 try
                 {
-                    // ReSharper disable once AssignNullToNotNullAttribute
                     var pictureAbsPath = Path.Combine(new FileInfo(blogFilePath).DirectoryName, picturePath);
                     if (File.Exists(pictureAbsPath))
                     {
@@ -184,7 +181,7 @@ namespace BlogPublishTool
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
 
-            if (blogPlatform == "cnblogs")
+            if (blogPlatform == "cnblogs" || blogFilePath.EndsWith("-csdn.md"))
             {
                 MdHandler.WriteFile(blogFilePath, outDirPath, "", blogContent);
             }
@@ -249,5 +246,6 @@ namespace BlogPublishTool
 
             }
         }
+
     }
 }

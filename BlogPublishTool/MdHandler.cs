@@ -32,10 +32,7 @@ namespace BlogPublishTool
 
         public static void WriteFile(string blogFilePath, string outDirPath, string blogPlatform, string blogContent)
         {
-
-
             var fileInfo = new FileInfo(blogFilePath);
-
             File.WriteAllText(Path.Combine(outDirPath, fileInfo.Name.Replace(fileInfo.Extension, blogPlatform + fileInfo.Extension)), blogContent);
         }
     }

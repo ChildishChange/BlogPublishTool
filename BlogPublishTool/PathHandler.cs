@@ -43,6 +43,22 @@ namespace BlogPublishTool
             }
             return null;
         }
+
+        public static List<string> GetAllMarkDown(string path)
+        {
+            var markDownList = new List<string>();
+
+            if (new FileInfo(path).Attributes == FileAttributes.Directory)
+            {
+                markDownList = GetAllMarkDown(path, markDownList);
+            }
+            else
+            {
+                markDownList.Add(path);
+            }
+            return markDownList;
+        }
+
         public static List<string> GetAllMarkDown(string path, List<string> markDownList)
         {
             var directoryInfo = new DirectoryInfo(path);
