@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using MetaWeblogClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -225,9 +226,24 @@ namespace BlogPublishTool
             else
             {
                 Console.WriteLine("[INFO]START PUBLISH BLOG\n");
-                Console.WriteLine("[INFO]Please input title of this blog:\n" + blogFilePath);
-                var blogTitle = Console.ReadLine();
+               
+                var titleList = Regex.Matches(File.ReadAllText(blogFilePath), @"^#.*\n", RegexOptions.IgnoreCase | RegexOptions.RightToLeft)
+                    .Cast<Match>()
+                    .Select(m => m.Value)
+                    .ToArray();
 
+
+
+                string blogTitle = string.Empty;
+                if(titleList.Length == 0)
+                {
+                    Console.WriteLine($"[INFO]Missing title in .md file {blogFilePath}, please input manually.");
+                    blogTitle = Console.ReadLine();
+                }
+                else
+                {
+                    blogTitle = titleList.First().Trim('#','\n','\r',' ');
+                }
 
                 var postId = blogClient.NewPost(blogTitle, blogContent, new List<string> { "[Markdown]" }, true, DateTime.Now);
                 var blogUrl = _connectionInfo.BlogURL + "/p/" + postId + ".html";
