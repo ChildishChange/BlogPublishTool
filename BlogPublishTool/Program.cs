@@ -22,26 +22,14 @@ namespace BlogPublishTool
             if(!string.IsNullOrWhiteSpace(opts.InputPath))
             {
                 var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
-
                 var blogHandler = new BlogHandler();
-                if (opts.TestFlag)
-                {
-                    foreach (var markDownPath in markDownList)
-                    {
-                        blogHandler.UploadPicture(markDownPath, true);
-                    }
-                }
-                else
-                {
-                    foreach (var markDownPath in markDownList)
-                    {
-                        blogHandler.UploadPicture(markDownPath, false);
 
-                    }
+                foreach (var markDownPath in markDownList)
+                {
+                    blogHandler.UploadPicture(markDownPath, opts.TestFlag);
                 }
             }
             return 0;
-
         }
 
         public static int RunReplaceOptions(ReplaceOptions opts)

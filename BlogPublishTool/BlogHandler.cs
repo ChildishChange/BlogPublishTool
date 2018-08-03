@@ -208,6 +208,15 @@ namespace BlogPublishTool
                 blogJsonDic.Add(blog.Properties().First().Name, blog);
             }
 
+            if (blogFilePath.EndsWith("-csdn.md"))
+            {
+                Console.WriteLine("[INFO]START BLOG EDITTING");
+                Console.WriteLine($"[INFO]{blogFilePath} is a csdn blog, cannot be published now.");
+                Console.WriteLine("[INFO]END PUBLISH BLOG");
+                return;
+            }
+
+
             if (blogJsonDic.ContainsKey(fileInfo.Name))
             {
                 var blogUrl = blogJsonDic[fileInfo.Name][fileInfo.Name]["cnblogs"].ToString();
@@ -215,7 +224,7 @@ namespace BlogPublishTool
 
 
                 Console.WriteLine("[INFO]This blogs has been published before:\n" + blogFilePath);
-                Console.WriteLine("[INFO]START BLOG EDITTING");
+                
                 blogClient.EditPost(postId,
                                     blogJsonDic[fileInfo.Name][fileInfo.Name]["title"].ToString(),
                                     blogContent,
@@ -226,14 +235,13 @@ namespace BlogPublishTool
             else
             {
                 Console.WriteLine("[INFO]START PUBLISH BLOG\n");
-               
+
+
                 var titleList = Regex.Matches(File.ReadAllText(blogFilePath), @"^#.*\n", RegexOptions.IgnoreCase | RegexOptions.RightToLeft)
                     .Cast<Match>()
                     .Select(m => m.Value)
                     .ToArray();
-
-
-
+                
                 string blogTitle = string.Empty;
                 if(titleList.Length == 0)
                 {
@@ -249,19 +257,14 @@ namespace BlogPublishTool
                 var blogUrl = _connectionInfo.BlogURL + "/p/" + postId + ".html";
                 Console.WriteLine("[INFO]Blog published here: " + blogUrl);
 
-
-                var newBlogJsonText = "{\"" + fileInfo.Name + "\":{\"title\":\""+blogTitle+"\",\"cnblogs\":\""+blogUrl+"\",\"csdn\":\""+""+"\"}}";
+                var newBlogJsonText = "{\n\"" + fileInfo.Name + "\":{\n\"title\":\""+blogTitle+"\",\n\"cnblogs\":\""+blogUrl+"\",\n\"csdn\":\""+""+"\"\n}\n}";
                 var newBlog = (JObject)JsonConvert.DeserializeObject(newBlogJsonText);
-
-
+                
                 blogJson.Add(newBlog);
                 File.WriteAllText(jsonFilePath,JsonConvert.SerializeObject(blogJson));
                 Console.WriteLine("[INFO]Refreshed json");
-
                 Console.WriteLine("[INFO]END PUBLISH BLOG");
-
             }
         }
-
     }
 }
