@@ -13,33 +13,23 @@ namespace BlogPublishTool
             try
             {
                 var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
-
                 var fileInfo = new FileInfo(absPath);
 
                 if (fileInfo.Attributes == FileAttributes.Directory)
                 {
                     var directoryInfo = new DirectoryInfo(absPath);
-                    if (directoryInfo.Exists)
-                    {
-                        return absPath;
-                    }
-
-                    Console.WriteLine("Not exists! Please check the directory path: {0}!", path);
+                    if (directoryInfo.Exists) return absPath;
+                    Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {0}!", path);
                 }
                 else
                 {
-                    if (fileInfo.Exists)
-                    {
-                        return absPath;
-                    }
-
-                    Console.WriteLine("Not exists! Please check the file path: {0}!", path);
-                    return null;
+                    if (fileInfo.Exists) return absPath;
+                    Console.WriteLine($"[ERROR]Not exists! Please check the file path: {0}!", path);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("{0} Please check the path: {1}!", ex.Message, path);
+                Console.WriteLine($"[INFO]{0} Please check the path: {1}!", ex.Message, path);
             }
             return null;
         }

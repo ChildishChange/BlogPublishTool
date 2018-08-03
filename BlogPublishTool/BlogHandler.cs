@@ -22,10 +22,8 @@ namespace BlogPublishTool
         {
             Console.WriteLine("Please input your blog ID:");
             var blogId = Console.ReadLine();
-
             Console.WriteLine("Please input your user name:");
             var userName = Console.ReadLine();
-
             Console.WriteLine("Please input your password:");
             var passWord = GetPassword();
             
@@ -35,6 +33,7 @@ namespace BlogPublishTool
                 blogId,
                 userName,
                 passWord);
+
             InitPicFileTable();
         }
 
@@ -142,8 +141,7 @@ namespace BlogPublishTool
             
             Console.WriteLine("[INFO]END UPLOAD PICTURE\n");
         }
-
-
+        
         public static void ReplaceBlogUrl(string blogFilePath, string outDirPath, string jsonFilePath, string blogPlatform)
         {
             Console.WriteLine($"[INFO]START REPLACE BLOG URL:\n{blogFilePath}");
@@ -170,7 +168,7 @@ namespace BlogPublishTool
                     var blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
                     if (!blogUrlDic.ContainsKey(link))
                     {
-                        Console.WriteLine($"[INFO]replace link {link} to {blogUrl}");
+                        Console.WriteLine($"[INFO]Replace link {link} to {blogUrl}");
                         blogUrlDic.Add(link, blogUrl);
                     }
                 }
@@ -180,8 +178,7 @@ namespace BlogPublishTool
                 }
             }
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
-
-
+            
             if (blogPlatform == "cnblogs" || blogFilePath.EndsWith("-csdn.md"))
             {
                 MdHandler.WriteFile(blogFilePath, outDirPath, "", blogContent);
@@ -200,70 +197,68 @@ namespace BlogPublishTool
             var blogContent = File.ReadAllText(blogFilePath);
 
             var fileInfo = new FileInfo(blogFilePath);
-            var blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
-            var blogJsonDic = new Dictionary<string, JObject>();
-            foreach (var jToken in blogJson)
+
+            try
             {
-                var blog = (JObject)jToken;
-                blogJsonDic.Add(blog.Properties().First().Name, blog);
-            }
-
-            if (blogFilePath.EndsWith("-csdn.md"))
-            {
-                Console.WriteLine("[INFO]START BLOG EDITTING");
-                Console.WriteLine($"[INFO]{blogFilePath} is a csdn blog, cannot be published now.");
-                Console.WriteLine("[INFO]END PUBLISH BLOG");
-                return;
-            }
-
-
-            if (blogJsonDic.ContainsKey(fileInfo.Name))
-            {
-                var blogUrl = blogJsonDic[fileInfo.Name][fileInfo.Name]["cnblogs"].ToString();
-                var postId = blogUrl.Replace(_connectionInfo.BlogURL + "/p/", "").Replace(".html","");
-
-
-                Console.WriteLine("[INFO]This blogs has been published before:\n" + blogFilePath);
-                
-                blogClient.EditPost(postId,
-                                    blogJsonDic[fileInfo.Name][fileInfo.Name]["title"].ToString(),
-                                    blogContent,
-                                    new List<string> { "[Markdown]" },
-                                    true);
-                Console.WriteLine("[INFO]END BLOG EDITTING");
-            }
-            else
-            {
-                Console.WriteLine("[INFO]START PUBLISH BLOG\n");
-
-
-                var titleList = Regex.Matches(File.ReadAllText(blogFilePath), @"^#.*\n", RegexOptions.IgnoreCase | RegexOptions.RightToLeft)
-                    .Cast<Match>()
-                    .Select(m => m.Value)
-                    .ToArray();
-                
-                string blogTitle = string.Empty;
-                if(titleList.Length == 0)
+                var blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
+                var blogJsonDic = new Dictionary<string, JObject>();
+                foreach (var jToken in blogJson)
                 {
-                    Console.WriteLine($"[INFO]Missing title in .md file {blogFilePath}, please input manually.");
-                    blogTitle = Console.ReadLine();
+                    var blog = (JObject)jToken;
+                    blogJsonDic.Add(blog.Properties().First().Name, blog);
+                }
+
+                if (blogJsonDic.ContainsKey(fileInfo.Name))
+                {
+                    var blogUrl = blogJsonDic[fileInfo.Name][fileInfo.Name]["cnblogs"].ToString();
+                    var postId = blogUrl.Replace(_connectionInfo.BlogURL + "/p/", "").Replace(".html", "");
+                    
+                    Console.WriteLine("[INFO]THIS BLOGS HAS BEEN PUBLISHED BEFORE:\n" + blogFilePath);
+
+                    blogClient.EditPost(postId,
+                                        blogJsonDic[fileInfo.Name][fileInfo.Name]["title"].ToString(),
+                                        blogContent,
+                                        new List<string> { "[Markdown]" },
+                                        true);
+
+                    Console.WriteLine("[INFO]END BLOG EDITTING");
                 }
                 else
                 {
-                    blogTitle = titleList.First().Trim('#','\n','\r',' ');
+                    Console.WriteLine("[INFO]START PUBLISH BLOG\n");
+                    
+                    var titleList = Regex.Matches(File.ReadAllText(blogFilePath), @"^#.*\n", RegexOptions.IgnoreCase | RegexOptions.RightToLeft)
+                        .Cast<Match>()
+                        .Select(m => m.Value)
+                        .ToArray();
+
+                    string blogTitle = string.Empty;
+                    if (titleList.Length == 0)
+                    {
+                        Console.WriteLine($"[INFO]Missing title in .md file {blogFilePath}, please input manually.");
+                        blogTitle = Console.ReadLine();
+                    }
+                    else
+                    {
+                        blogTitle = titleList.First().Trim('#', '\n', '\r', ' ');
+                    }
+
+                    var postId = blogClient.NewPost(blogTitle, blogContent, new List<string> { "[Markdown]" }, true, DateTime.Now);
+                    var blogUrl = _connectionInfo.BlogURL + "/p/" + postId + ".html";
+                    Console.WriteLine($"[INFO]Blog {blogTitle} published here: " + blogUrl);
+
+                    var newBlogJsonText = "{\n\"" + fileInfo.Name + "\":{\n\"title\":\"" + blogTitle + "\",\n\"cnblogs\":\"" + blogUrl + "\",\n\"csdn\":\"" + "" + "\"\n}\n}";
+                    var newBlog = (JObject)JsonConvert.DeserializeObject(newBlogJsonText);
+
+                    blogJson.Add(newBlog);
+                    File.WriteAllText(jsonFilePath, JsonConvert.SerializeObject(blogJson));
+                    Console.WriteLine("[INFO]Refreshed json");
+                    Console.WriteLine("[INFO]END PUBLISH BLOG");
                 }
-
-                var postId = blogClient.NewPost(blogTitle, blogContent, new List<string> { "[Markdown]" }, true, DateTime.Now);
-                var blogUrl = _connectionInfo.BlogURL + "/p/" + postId + ".html";
-                Console.WriteLine("[INFO]Blog published here: " + blogUrl);
-
-                var newBlogJsonText = "{\n\"" + fileInfo.Name + "\":{\n\"title\":\""+blogTitle+"\",\n\"cnblogs\":\""+blogUrl+"\",\n\"csdn\":\""+""+"\"\n}\n}";
-                var newBlog = (JObject)JsonConvert.DeserializeObject(newBlogJsonText);
-                
-                blogJson.Add(newBlog);
-                File.WriteAllText(jsonFilePath,JsonConvert.SerializeObject(blogJson));
-                Console.WriteLine("[INFO]Refreshed json");
-                Console.WriteLine("[INFO]END PUBLISH BLOG");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ERROR]" + e.Message);
             }
         }
     }

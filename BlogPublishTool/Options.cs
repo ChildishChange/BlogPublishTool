@@ -15,8 +15,6 @@ namespace BlogPublishTool
         public string LinkJsonPath { get; set; }
     }
     
-    
-
     [Verb("replace", HelpText = "Replace link of picture in the blog.")]
     public class ReplaceOptions
     {

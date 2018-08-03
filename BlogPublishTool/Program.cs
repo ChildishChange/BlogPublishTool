@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine;
 
 namespace BlogPublishTool
@@ -60,15 +61,12 @@ namespace BlogPublishTool
                         BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
                     }
                 }
-                
             }
-
             return 0;
         }
 
         public static int RunPublishOptions(PublishOptions opts)
         {
-            
             opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
             opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath);
 
@@ -76,7 +74,6 @@ namespace BlogPublishTool
                 !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
                 var blogHandler = new BlogHandler();
-
                 var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 foreach (var markDownPath in markDownList)
@@ -85,12 +82,15 @@ namespace BlogPublishTool
                     {
                         blogHandler.PublishBlog(markDownPath,opts.LinkJsonPath);
                     }
+                    else
+                    {
+                        Console.WriteLine("[INFO]START BLOG PUBLISHING");
+                        Console.WriteLine($"[INFO]{markDownPath} is a csdn blog, cannot be published now.");
+                        Console.WriteLine("[INFO]END PUBLISH BLOG");
+                    }
                 }
             }
-            
             return 0;
         }
-
-        
     }
 }
