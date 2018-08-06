@@ -48,8 +48,8 @@ namespace BlogPublishTool
                 {
                     foreach (var markDownPath in markDownList)
                     {
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
+                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
+                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
                         
                     }
                 }
@@ -57,8 +57,11 @@ namespace BlogPublishTool
                 {
                     foreach (var markDownPath in markDownList)
                     {
-                        BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, new FileInfo(markDownPath).DirectoryName, opts.LinkJsonPath, "csdn");
+                        //markdown-input要在这里传进去
+                        //输出路径为inputpath/output/平台/+传进去的值
+
+                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.InputPath, opts.LinkJsonPath, "cnblogs");
+                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.InputPath, opts.LinkJsonPath, "csdn");
                     }
                 }
             }

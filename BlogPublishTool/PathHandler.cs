@@ -18,12 +18,12 @@ namespace BlogPublishTool
                 if (fileInfo.Attributes == FileAttributes.Directory)
                 {
                     var directoryInfo = new DirectoryInfo(absPath);
-                    if (directoryInfo.Exists) return absPath;
+                    if (directoryInfo.Exists) return directoryInfo.FullName;
                     Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {0}!", path);
                 }
                 else
                 {
-                    if (fileInfo.Exists) return absPath;
+                    if (fileInfo.Exists) return fileInfo.FullName;
                     Console.WriteLine($"[ERROR]Not exists! Please check the file path: {0}!", path);
                 }
             }

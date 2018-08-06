@@ -142,7 +142,7 @@ namespace BlogPublishTool
             Console.WriteLine("[INFO]END UPLOAD PICTURE\n");
         }
         
-        public static void ReplaceBlogUrl(string blogFilePath, string outDirPath, string jsonFilePath, string blogPlatform)
+        public static void ReplaceBlogUrl(string blogFilePath, string inDirPath, string outDirPath, string jsonFilePath, string blogPlatform)
         {
             Console.WriteLine($"[INFO]START REPLACE BLOG URL:\n{blogFilePath}");
             const string matchRule = @"\[.*?\]\((.*?\.md)\)";
@@ -178,15 +178,19 @@ namespace BlogPublishTool
                 }
             }
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
+
+            FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, ".\\output\\" + blogPlatform + "\\", blogFilePath.Replace(inDirPath, ".")));
+
+
+            if(!Directory.Exists(outPutFile.DirectoryName))
+            {
+                Directory.CreateDirectory(outPutFile.DirectoryName);
+            }
+
+            File.WriteAllText(outPutFile.FullName,blogContent);
             
-            if (blogPlatform == "cnblogs" || blogFilePath.EndsWith("-csdn.md"))
-            {
-                MdHandler.WriteFile(blogFilePath, outDirPath, "", blogContent);
-            }
-            else
-            {
-                MdHandler.WriteFile(blogFilePath, outDirPath, "-" + blogPlatform, blogContent);
-            }
+
+          
             Console.WriteLine("[INFO]END REPLACE BLOG URL");
         }
 
