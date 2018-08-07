@@ -172,7 +172,7 @@ namespace BlogPublishTool
                 try
                 {
                     //link改为markdown所在目录的相对路径
-                    var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link));
+                    var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link).Replace("%20"," "));
                     //这个json的检索好麻烦
                     var blogUrl = blogJsonDic[absLink][blogJsonDic[absLink].Properties().First().Name][blogPlatform].ToString();
 

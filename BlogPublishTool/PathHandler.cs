@@ -19,17 +19,17 @@ namespace BlogPublishTool
                 {
                     var directoryInfo = new DirectoryInfo(absPath);
                     if (directoryInfo.Exists) return directoryInfo.FullName;
-                    Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {0}!", path);
+                    Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {directoryInfo.FullName}!");
                 }
                 else
                 {
                     if (fileInfo.Exists) return fileInfo.FullName;
-                    Console.WriteLine($"[ERROR]Not exists! Please check the file path: {0}!", path);
+                    Console.WriteLine($"[ERROR]Not exists! Please check the file path: {fileInfo.FullName}!");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[INFO]{0} Please check the path: {1}!", ex.Message, path);
+                Console.WriteLine($"[INFO]{ex.Message} Please check the path: {path}!");
             }
             return null;
         }
