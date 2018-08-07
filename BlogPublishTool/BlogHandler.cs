@@ -150,10 +150,14 @@ namespace BlogPublishTool
             var blogUrlDic = new Dictionary<string, string>();
             var blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
             var blogJsonDic = new Dictionary<string, JObject>();
+
+
             foreach (var jToken in blogJson)
-            {
+            {   
+                //key改为input+json的name
                 var blog = (JObject) jToken;
-                blogJsonDic.Add(blog.Properties().First().Name, blog);
+                blogJsonDic.Add(
+                    PathHandler.GetAbsPath(Path.Combine(inDirPath, blog.Properties().First().Name)), blog);
             }
 
             foreach (var link in linkList)
@@ -165,7 +169,13 @@ namespace BlogPublishTool
                 }
                 try
                 {
-                    var blogUrl = blogJsonDic[link][link][blogPlatform].ToString();
+                    //link改为markdown所在目录的相对路径
+                    //
+                    var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link));
+                    //这个json的检索好麻烦
+                    var blogUrl = blogJsonDic[absLink][blogJsonDic[absLink].Properties().First().Name][blogPlatform].ToString();
+
+
                     if (!blogUrlDic.ContainsKey(link))
                     {
                         Console.WriteLine($"[INFO]Replace link {link} to {blogUrl}");
@@ -189,8 +199,6 @@ namespace BlogPublishTool
 
             File.WriteAllText(outPutFile.FullName,blogContent);
             
-
-          
             Console.WriteLine("[INFO]END REPLACE BLOG URL");
         }
 
