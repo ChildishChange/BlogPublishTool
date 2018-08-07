@@ -43,26 +43,23 @@ namespace BlogPublishTool
                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
                 var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
-
-                if (!string.IsNullOrWhiteSpace(opts.OutputPath))
+                
+                if (string.IsNullOrWhiteSpace(opts.OutputPath))
                 {
-                    foreach (var markDownPath in markDownList)
-                    {
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
-                        
-                    }
+                    opts.OutputPath = opts.InputPath;
                 }
-                else
-                {
-                    foreach (var markDownPath in markDownList)
-                    {
-                        //markdown-input要在这里传进去
-                        //输出路径为inputpath/output/平台/+传进去的值
 
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.InputPath, opts.LinkJsonPath, "cnblogs");
-                        BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.InputPath, opts.LinkJsonPath, "csdn");
-                    }
+                //判断是否已经有了output文件夹，有就删掉
+                DirectoryInfo outPut = new DirectoryInfo(Path.Combine(opts.OutputPath, ".\\output\\"));
+                if(outPut.Exists)
+                {
+                    outPut.Delete();
+                }
+
+                foreach (var markDownPath in markDownList)
+                {
+                    BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "cnblogs");
+                    BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
                 }
             }
             return 0;
