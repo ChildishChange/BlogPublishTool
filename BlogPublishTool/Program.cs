@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommandLine;
 
 namespace BlogPublishTool
@@ -48,19 +50,28 @@ namespace BlogPublishTool
                     opts.OutputPath = opts.InputPath;
                 }
 
-                //判断是否已经有了output文件夹，有就删掉
-                DirectoryInfo outPut = new DirectoryInfo(Path.Combine(opts.OutputPath, ".\\output\\"));
-                try
+                List<string> markDownList = new List<string>();
+                
+                if ((new FileInfo(opts.InputPath).Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    if (outPut.Exists)
-                        Directory.Delete(outPut.FullName, true);
+                    var directoryInfo = new DirectoryInfo(opts.InputPath);
+
+                    var fileInfos = directoryInfo.GetFiles();
+                    var directoryInfos = directoryInfo.GetDirectories();
+
+                    markDownList.AddRange(from file in fileInfos where file.Extension == ".md" select file.FullName);
+
+                    foreach (var dir in directoryInfos)
+                    {
+                        if (dir.Name == "output")
+                            continue;
+                        PathHandler.GetAllMarkDown(dir.FullName, markDownList);
+                    }
                 }
-                catch(Exception ex)
+                else
                 {
-                    Console.WriteLine($"[ERROR]PLEASE CLOSE OUTPUT DIRECTORY:\n{outPut.FullName}");
-                    return 0;
+                    markDownList.Add(opts.InputPath);
                 }
-                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 foreach (var markDownPath in markDownList)
                 {
@@ -68,7 +79,7 @@ namespace BlogPublishTool
                     BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
                 }
             }
-            Console.ReadKey();
+            
             return 0;
         }
 

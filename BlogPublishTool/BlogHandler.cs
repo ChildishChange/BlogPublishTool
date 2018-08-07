@@ -191,7 +191,7 @@ namespace BlogPublishTool
             }
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
-            FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, ".\\output\\" + blogPlatform + "\\", blogFilePath.Replace(inDirPath, ".")));
+            FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, ".\\output\\" + blogPlatform + "\\", blogFilePath.Replace(inDirPath, ".\\")));//这里要改
             
             if(!Directory.Exists(outPutFile.DirectoryName))
             {

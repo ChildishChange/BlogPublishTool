@@ -19,7 +19,7 @@ namespace BlogPublishTool
 
                 var fileInfo = new FileInfo(absPath);
 
-                if (fileInfo.Attributes == FileAttributes.Directory)
+                if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                 {
                     var directoryInfo = new DirectoryInfo(absPath);
                     if (directoryInfo.Exists) return directoryInfo.FullName;
@@ -30,10 +30,11 @@ namespace BlogPublishTool
                     if (fileInfo.Exists) return fileInfo.FullName;
                     Console.WriteLine($"[ERROR]Not exists! Please check the file path: {fileInfo.FullName}!");
                 }
+                
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[INFO]{ex.Message} Please check the path: {path}!");
+                Console.WriteLine($"[ERROR]{ex.Message} Please check the path: {path}!");
             }
             return null;
         }
@@ -42,7 +43,7 @@ namespace BlogPublishTool
         {
             var markDownList = new List<string>();
 
-            if (new FileInfo(path).Attributes == FileAttributes.Directory)
+            if ((new FileInfo(path).Attributes & FileAttributes.Directory) == FileAttributes.Directory)
             {
                 markDownList = GetAllMarkDown(path, markDownList);
             }
