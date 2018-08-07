@@ -13,6 +13,10 @@ namespace BlogPublishTool
             try
             {
                 var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
+
+                //replace %20 with blank
+                absPath = absPath.Replace("%20", " ");
+
                 var fileInfo = new FileInfo(absPath);
 
                 if (fileInfo.Attributes == FileAttributes.Directory)
