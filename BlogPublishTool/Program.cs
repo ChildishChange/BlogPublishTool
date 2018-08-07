@@ -8,11 +8,11 @@ namespace BlogPublishTool
     {
         public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<UploadPicOptions, ReplaceOptions, PublishOptions>(args)
+            Parser.Default.ParseArguments<UploadPicOptions, ReplaceOptions>(args)
                 .MapResult(
                   (UploadPicOptions opts)=> RunUploadPicOptions(opts),
                   (ReplaceOptions opts) => RunReplaceOptions(opts),
-                  (PublishOptions opts) => RunPublishOptions(opts),
+//                  (PublishOptions opts) => RunPublishOptions(opts),
                   errs => 1);
         }
 
@@ -42,7 +42,6 @@ namespace BlogPublishTool
             if (!string.IsNullOrWhiteSpace(opts.InputPath) &&
                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
-                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
                 
                 if (string.IsNullOrWhiteSpace(opts.OutputPath))
                 {
@@ -51,10 +50,17 @@ namespace BlogPublishTool
 
                 //判断是否已经有了output文件夹，有就删掉
                 DirectoryInfo outPut = new DirectoryInfo(Path.Combine(opts.OutputPath, ".\\output\\"));
-                if(outPut.Exists)
+                try
                 {
-                    outPut.Delete();
+                    if (outPut.Exists)
+                        Directory.Delete(outPut.FullName, true);
                 }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"[ERROR]PLEASE CLOSE OUTPUT DIRECTORY:\n{outPut.FullName}");
+                    return 0;
+                }
+                var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
 
                 foreach (var markDownPath in markDownList)
                 {
@@ -62,6 +68,7 @@ namespace BlogPublishTool
                     BlogHandler.ReplaceBlogUrl(markDownPath, opts.InputPath, opts.OutputPath, opts.LinkJsonPath, "csdn");
                 }
             }
+            Console.ReadKey();
             return 0;
         }
 

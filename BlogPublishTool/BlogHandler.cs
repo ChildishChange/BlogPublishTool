@@ -157,7 +157,9 @@ namespace BlogPublishTool
                 //key改为input+json的name
                 var blog = (JObject) jToken;
                 blogJsonDic.Add(
-                    PathHandler.GetAbsPath(Path.Combine(inDirPath, blog.Properties().First().Name)), blog);
+                    PathHandler.GetAbsPath(
+                        Path.Combine(inDirPath, blog.Properties().First().Name)),
+                        blog);
             }
 
             foreach (var link in linkList)
@@ -170,7 +172,6 @@ namespace BlogPublishTool
                 try
                 {
                     //link改为markdown所在目录的相对路径
-                    //
                     var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link));
                     //这个json的检索好麻烦
                     var blogUrl = blogJsonDic[absLink][blogJsonDic[absLink].Properties().First().Name][blogPlatform].ToString();
@@ -185,13 +186,13 @@ namespace BlogPublishTool
                 catch (Exception e)
                 {
                     Console.WriteLine("[ERROR]"+e.Message);
+                    return;
                 }
             }
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
             FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, ".\\output\\" + blogPlatform + "\\", blogFilePath.Replace(inDirPath, ".")));
-
-
+            
             if(!Directory.Exists(outPutFile.DirectoryName))
             {
                 Directory.CreateDirectory(outPutFile.DirectoryName);
