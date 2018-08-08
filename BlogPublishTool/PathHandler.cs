@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace BlogPublishTool
 {
@@ -15,7 +16,7 @@ namespace BlogPublishTool
                 var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
 
                 //replace %20 with blank, need revise
-                absPath = absPath.Replace("%20", " ");
+                absPath = WebUtility.UrlDecode(absPath);
 
                 var fileInfo = new FileInfo(absPath);
 
@@ -50,6 +51,11 @@ namespace BlogPublishTool
             }
             else
             {
+                if (!path.ToLower().EndsWith(".md"))
+                {
+                    Console.WriteLine("[ERROR]Not a markdown file! Please check path : " + path);
+                    return markDownList;
+                }
                 markDownList.Add(path);
             }
             return markDownList;
@@ -62,7 +68,7 @@ namespace BlogPublishTool
             var fileInfos = directoryInfo.GetFiles();
             var directoryInfos = directoryInfo.GetDirectories();
 
-            markDownList.AddRange(from file in fileInfos where file.Extension == ".md" select file.FullName);
+            markDownList.AddRange(from file in fileInfos where file.Extension.ToLower() == ".md" select file.FullName);
 
             foreach(var dir in directoryInfos)
             {

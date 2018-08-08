@@ -52,6 +52,12 @@ namespace BlogPublishTool
                     opts.OutputPath = opts.InputPath;
                 }
 
+                if (!File.Exists(opts.LinkJsonPath))
+                {
+                    Console.WriteLine("[ERROR]Json must be a file! Please check path : " + opts.LinkJsonPath);
+                    return 0;
+                }
+
                 List<string> markDownList = new List<string>();
                 
                 if ((new FileInfo(opts.InputPath).Attributes & FileAttributes.Directory) == FileAttributes.Directory)
@@ -61,7 +67,7 @@ namespace BlogPublishTool
                     var fileInfos = directoryInfo.GetFiles();
                     var directoryInfos = directoryInfo.GetDirectories();
 
-                    markDownList.AddRange(from file in fileInfos where file.Extension == ".md" select file.FullName);
+                    markDownList.AddRange(from file in fileInfos where file.Extension.ToLower() == ".md" select file.FullName);
 
                     foreach (var dir in directoryInfos)
                     {
@@ -72,6 +78,12 @@ namespace BlogPublishTool
                 }
                 else
                 {
+
+                    if (!opts.InputPath.ToLower().EndsWith(".md"))
+                    {
+                        Console.WriteLine("[ERROR]Not a markdown file! Please check path : " + opts.InputPath);
+                        return 0;
+                    }
                     markDownList.Add(opts.InputPath);
                 }
 
