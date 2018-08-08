@@ -7,14 +7,14 @@ namespace BlogPublishTool
 {
     public class PathHandler
     {
-        public static string GetAbsPath(string path)
+        public static string GetAbsPath(string path, bool outFlag)
         {
             if (path == null) return null;
             try
             {
                 var absPath = !Path.IsPathRooted(path) ? Path.Combine(Directory.GetCurrentDirectory(), path) : path;
 
-                //replace %20 with blank
+                //replace %20 with blank, need revise
                 absPath = absPath.Replace("%20", " ");
 
                 var fileInfo = new FileInfo(absPath);
@@ -22,19 +22,20 @@ namespace BlogPublishTool
                 if ((fileInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                 {
                     var directoryInfo = new DirectoryInfo(absPath);
-                    if (directoryInfo.Exists) return directoryInfo.FullName;
-                    Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {directoryInfo.FullName}!");
+                    if (directoryInfo.Exists || outFlag) return directoryInfo.FullName;
+                    
+                    Console.WriteLine($"[ERROR]Not exists! Please check the directory path: {directoryInfo.FullName}");
                 }
                 else
                 {
-                    if (fileInfo.Exists) return fileInfo.FullName;
-                    Console.WriteLine($"[ERROR]Not exists! Please check the file path: {fileInfo.FullName}!");
+                    if (fileInfo.Exists || outFlag) return fileInfo.FullName;
+                    Console.WriteLine($"[ERROR]Not exists! Please check the file path: {fileInfo.FullName}");
                 }
                 
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR]{ex.Message} Please check the path: {path}!");
+                Console.WriteLine($"[ERROR]{ex.Message} Please check the path: {path}");
             }
             return null;
         }

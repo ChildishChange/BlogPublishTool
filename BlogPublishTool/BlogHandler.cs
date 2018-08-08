@@ -147,19 +147,23 @@ namespace BlogPublishTool
             Console.WriteLine($"[INFO]START REPLACE BLOG URL:\n{blogFilePath}");
             const string matchRule = @"\[.*?\]\((.*?\.md)\)";
             var linkList = MdHandler.RegexParser(blogFilePath, matchRule);
+
             var blogUrlDic = new Dictionary<string, string>();
+
             var blogJson = (JArray)JsonConvert.DeserializeObject(File.ReadAllText(jsonFilePath));
             var blogJsonDic = new Dictionary<string, JObject>();
 
+            if (!(inDirPath.EndsWith("\\") || inDirPath.EndsWith("/")))
+            {
+                inDirPath = inDirPath + '\\';
+            }
 
             foreach (var jToken in blogJson)
             {   
-                //key改为input+json的name
                 var blog = (JObject) jToken;
                 blogJsonDic.Add(
-                    PathHandler.GetAbsPath(
-                        Path.Combine(inDirPath, blog.Properties().First().Name)),
-                        blog);
+                    PathHandler.GetAbsPath(Path.Combine(inDirPath, blog.Properties().First().Name),false),
+                    blog);
             }
 
             foreach (var link in linkList)
@@ -171,12 +175,9 @@ namespace BlogPublishTool
                 }
                 try
                 {
-                    //link改为markdown所在目录的相对路径
-                    var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link));
-                    //这个json的检索好麻烦
+                    var absLink = PathHandler.GetAbsPath(Path.Combine(new FileInfo(blogFilePath).DirectoryName, link), false);
                     var blogUrl = blogJsonDic[absLink][blogJsonDic[absLink].Properties().First().Name][blogPlatform].ToString();
-
-
+                    
                     if (!blogUrlDic.ContainsKey(link))
                     {
                         Console.WriteLine($"[INFO]Replace link {link} to {blogUrl}");
@@ -191,7 +192,10 @@ namespace BlogPublishTool
             }
             var blogContent = MdHandler.ReplaceContentWithUrl(blogFilePath, blogUrlDic);
 
-            FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, ".\\output\\" + blogPlatform + "\\", blogFilePath.Replace(inDirPath, ".\\")));//这里要改
+            FileInfo outPutFile = new FileInfo(Path.Combine(outDirPath, 
+                                                            ".\\output\\" + blogPlatform + "\\", 
+                                                            blogFilePath.Replace(inDirPath, ".\\")//这里要改
+                                                            ));
             
             if(!Directory.Exists(outPutFile.DirectoryName))
             {

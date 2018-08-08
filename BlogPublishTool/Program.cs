@@ -20,11 +20,12 @@ namespace BlogPublishTool
 
         public static int RunUploadPicOptions(UploadPicOptions opts)
         {
-            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
+            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath,false);
             
             if(!string.IsNullOrWhiteSpace(opts.InputPath))
             {
                 var markDownList = PathHandler.GetAllMarkDown(opts.InputPath);
+
                 var blogHandler = new BlogHandler();
 
                 foreach (var markDownPath in markDownList)
@@ -37,12 +38,13 @@ namespace BlogPublishTool
 
         public static int RunReplaceOptions(ReplaceOptions opts)
         {
-            opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath);
-            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
-            opts.OutputPath = PathHandler.GetAbsPath(opts.OutputPath);
+            opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath, false);
+            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath, false);
+
+            opts.OutputPath = PathHandler.GetAbsPath(opts.OutputPath, true);
 
             if (!string.IsNullOrWhiteSpace(opts.InputPath) &&
-               !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
+                !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
             {
                 
                 if (string.IsNullOrWhiteSpace(opts.OutputPath))
@@ -85,8 +87,8 @@ namespace BlogPublishTool
 
         public static int RunPublishOptions(PublishOptions opts)
         {
-            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath);
-            opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath);
+            opts.InputPath = PathHandler.GetAbsPath(opts.InputPath,false);
+            opts.LinkJsonPath = PathHandler.GetAbsPath(opts.LinkJsonPath,false);
 
             if (!string.IsNullOrWhiteSpace(opts.InputPath) &&
                 !string.IsNullOrWhiteSpace(opts.LinkJsonPath))
